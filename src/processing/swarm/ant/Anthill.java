@@ -39,7 +39,6 @@ public class Anthill {
         for (int ant = 0; ant < antReleaseRate; ant++){
             if(antsArray.size() < maxAnts){
                 antsArray.add(new Ant(sketch,this,maxAntLife));
-                //antCount++;
             }
         }
     }
@@ -88,24 +87,10 @@ public class Anthill {
         
         ant.life--;
         if (ant.life == 0) {
-            /*for (int a = 0; a < antsArray.size(); a++) {  // NOTE: Very slow way to remove this ant from the ants ArrayList...
-                Ant ant_tocheck = (Ant) antsArray.get(a);
-                if (ant_tocheck.id == ant.id) {
-                    if ((ant.hasFood) && (!ant.atAnthill())) {
-                        pheromone.positions[ant.antx][ant.anty].foodCount ++;
-                    }
-                    antsArray.remove(a);
-                    antCount--;
-                    break;
-                }
-            }*/
-            //v2
             if ((ant.hasFood) && (!ant.atAnthill())) {
                 pheromone.positions[ant.antx][ant.anty].foodCount ++;
             }
             antsArray.remove(ant);
-            //antCount--;
-            
         }
     }
 
