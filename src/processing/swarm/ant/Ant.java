@@ -1,5 +1,6 @@
 package processing.swarm.ant;
 
+import java.util.UUID;
 import processing.core.PApplet;
 
 public class Ant {
@@ -10,10 +11,10 @@ public class Ant {
     protected int maxAntLife = 1000;
     protected int timeGearing;
 
-    protected int life = 1000;
+    protected int life = maxAntLife;
     protected boolean hasFood;
 
-    protected String id = "";
+    protected UUID id;
 
     protected int antx, anty;
     protected Direction direction;
@@ -21,32 +22,31 @@ public class Ant {
     protected int antColorR, antColorG, antColorB;
     protected int antColorWithFoodR, antColorWithFoodG, antColorWithFoodB;
 
-    Pheromone pheromone;
     Food food;
     
     Orientation orientation = new Orientation();
 
-    public Ant(PApplet sketch, Anthill anthill, Pheromone pheromone) {
+    public Ant(PApplet sketch, Anthill anthill, int maxAntLife) {
         this.sketch = sketch;
         this.anthill = anthill; 
-        this.pheromone = pheromone;
+        this.maxAntLife = maxAntLife;
         antx = anthill.anthillx;
         anty = anthill.anthilly;
         hasFood = false;
-        id = PApplet.str((sketch.random(99999)));
+
         direction = new Direction(0, 0);
         direction.directionx = (int) (Math.random()*2 -1);
         direction.directiony = (int) (Math.random()*2 -1);
     }
     
-    private boolean atAnthill() { 
+    protected boolean atAnthill() { 
         return ((antx == anthill.anthillx) && (anty == anthill.anthilly));
     }
 
-    private boolean atFood(Position[][] positions) {
+    protected boolean atFood(Position[][] positions) {
         return (positions[antx][anty].foodCount > 0);
     }
-
+    /*
     public void moveAntsForFood(int timeGearing, Food food) {
         for (int i = 0; i < anthill.antsArray.size() * timeGearing; i++) {
             int antRandom = (int) (Math.random()* anthill.antsArray.size());
@@ -59,7 +59,7 @@ public class Ant {
         if (hasFood) {
             if (atAnthill()) { //Ant has food and it's at home
                 hasFood = false;
-                pheromone.positions[antx][anty].pheromoneHome = pheromone.maxPheromone;
+                anthill.pheromone.positions[antx][anty].pheromoneHome = anthill.pheromone.maxPheromone;
                 spin180();
                 findFood(this);
                 anthill.foodAccumulated++;
@@ -68,23 +68,23 @@ public class Ant {
                     sketch.exit();
                 }
             } else {
-                pheromone.positions[antx][anty].pheromoneFood += (pheromone.maxPheromone * life / maxAntLife);
-                pheromone.positions[antx][anty].pheromoneFood = Math.min(pheromone.positions[antx][anty].pheromoneFood, pheromone.maxPheromone);
+                anthill.pheromone.positions[antx][anty].pheromoneFood += (anthill.pheromone.maxPheromone * life / maxAntLife);
+                anthill.pheromone.positions[antx][anty].pheromoneFood = Math.min(anthill.pheromone.positions[antx][anty].pheromoneFood, anthill.pheromone.maxPheromone);
                 findAnthill(this);
             }
         } else {
-            if (atFood(pheromone.positions)) {
-                pheromone.positions[antx][anty].foodCount--;
+            if (atFood(anthill.pheromone.positions)) {
+                anthill.pheromone.positions[antx][anty].foodCount--;
                 hasFood = true;
                 spin180();
-                pheromone.positions[antx][anty].pheromoneFood = pheromone.maxPheromone;
+                anthill.pheromone.positions[antx][anty].pheromoneFood = anthill.pheromone.maxPheromone;
                 findAnthill(this);
             } else if (atAnthill()) {
-                pheromone.positions[antx][anty].pheromoneHome = pheromone.maxPheromone;
+                anthill.pheromone.positions[antx][anty].pheromoneHome = anthill.pheromone.maxPheromone;
                 findFood(this);
             } else {
-                pheromone.positions[antx][anty].pheromoneHome += (pheromone.maxPheromone * life / maxAntLife);
-                pheromone.positions[antx][anty].pheromoneHome = Math.min(pheromone.positions[antx][anty].pheromoneHome, pheromone.maxPheromone);
+                anthill.pheromone.positions[antx][anty].pheromoneHome += (anthill.pheromone.maxPheromone * life / maxAntLife);
+                anthill.pheromone.positions[antx][anty].pheromoneHome = Math.min(anthill.pheromone.positions[antx][anty].pheromoneHome, anthill.pheromone.maxPheromone);
                 findFood(this);
             }
         }
@@ -95,7 +95,7 @@ public class Ant {
                 Ant ant = (Ant) anthill.antsArray.get(a);
                 if (ant.id == id) {
                     if ((ant.hasFood) && (!atAnthill())) {
-                        pheromone.positions[antx][anty].foodCount ++;
+                        anthill.pheromone.positions[antx][anty].foodCount ++;
                     }
                     anthill.antsArray.remove(a);
                     anthill.antCount--;
@@ -128,11 +128,11 @@ public class Ant {
         // Weights
         float[] weights = new float[directionsCount];
         for (int i = 0; i < directionsCount; i++) {
-            if (pheromone.positions[ant.antx + directions[i].directionx][ant.anty + directions[i].directiony].inaccessible == false) {
+            if (anthill.pheromone.positions[ant.antx + directions[i].directionx][ant.anty + directions[i].directiony].inaccessible == false) {
                 if (object == "anthill") {
-                    weights[i] = (float) Math.pow(pheromone.alpha + pheromone.positions[ant.antx + directions[i].directionx][ant.anty + directions[i].directiony].pheromoneHome / pheromone.maxPheromone, pheromone.beta);
+                    weights[i] = (float) Math.pow(anthill.pheromone.alpha + anthill.pheromone.positions[ant.antx + directions[i].directionx][ant.anty + directions[i].directiony].pheromoneHome / anthill.pheromone.maxPheromone, anthill.pheromone.beta);
                 } else if (object == "food") {
-                    weights[i] = (float) Math.pow(pheromone.alpha + pheromone.positions[ant.antx + directions[i].directionx][ant.anty + directions[i].directiony].pheromoneFood / pheromone.maxPheromone, pheromone.beta);
+                    weights[i] = (float) Math.pow(anthill.pheromone.alpha + anthill.pheromone.positions[ant.antx + directions[i].directionx][ant.anty + directions[i].directiony].pheromoneFood / anthill.pheromone.maxPheromone, anthill.pheromone.beta);
                 }
             }
         }
@@ -151,7 +151,7 @@ public class Ant {
             if (r < weights_sum[j]) {
                 int x = ant.antx + directions[j].directionx;
                 int y = ant.anty + directions[j].directiony;
-                if (pheromone.positions[ant.antx][ant.anty].inaccessible == false) {
+                if (anthill.pheromone.positions[ant.antx][ant.anty].inaccessible == false) {
                     ant.antx = x;
                     ant.anty = y;
                     direction.directionx = directions[j].directionx;
@@ -180,5 +180,10 @@ public class Ant {
                 sketch.stroke(255);
             }
         }
+    }*/
+
+    @Override
+    public boolean equals(Object o) {
+        return (((Ant)o).id == this.id);
     }
 }
