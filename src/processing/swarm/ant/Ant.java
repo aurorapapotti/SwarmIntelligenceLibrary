@@ -1,5 +1,6 @@
 package processing.swarm.ant;
 
+import java.util.Objects;
 import java.util.UUID;
 import processing.core.PApplet;
 
@@ -33,7 +34,7 @@ public class Ant {
         antx = anthill.anthillx;
         anty = anthill.anthilly;
         hasFood = false;
-
+        id = UUID.randomUUID();
         direction = new Direction(0, 0);
         direction.directionx = (int) (Math.random()*2 -1);
         direction.directiony = (int) (Math.random()*2 -1);
@@ -50,5 +51,12 @@ public class Ant {
     @Override
     public boolean equals(Object o) {
         return (((Ant)o).id == this.id);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + Objects.hashCode(this.id);
+        return hash;
     }
 }
