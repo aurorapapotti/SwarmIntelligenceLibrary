@@ -2,7 +2,10 @@ package processing.swarm.ant;
 
 import processing.core.PApplet;
 
+
+
 public class Food {
+        
     PApplet sketch;
     
     protected int foodSources;
@@ -16,7 +19,8 @@ public class Food {
     protected Position[][] positions;
     protected int spaceWidth;
     protected int spaceHeight;
-    
+     
+            
     public Food(PApplet sketch, int anthillx, int anthilly) {
         this.sketch = sketch;
         this.anthillx = anthillx;
@@ -49,6 +53,7 @@ public class Food {
             }
         }
     }
+    
 
     public Position[][] getPositions() {
         return positions;

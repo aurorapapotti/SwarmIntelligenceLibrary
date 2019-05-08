@@ -4,3 +4,4 @@ build.xml
 copy.sh
 nbproject
 test
+/dist/

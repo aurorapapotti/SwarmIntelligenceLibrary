@@ -12,6 +12,7 @@ public class Pheromone {
     protected float beta;
     
     Position[][] positions;
+    protected Position[][] trials; 
     int spaceWidth;
     int spaceHeight;
     
