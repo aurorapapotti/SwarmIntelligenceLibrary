@@ -1,6 +1,5 @@
 package processing.swarm.ant;
 
-
 import java.util.Objects;
 import java.util.UUID;
 import processing.core.PApplet;

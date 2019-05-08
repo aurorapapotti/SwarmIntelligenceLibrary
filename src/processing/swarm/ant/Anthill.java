@@ -2,6 +2,8 @@ package processing.swarm.ant;
 
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 import processing.core.PApplet;
 
 public class Anthill {
@@ -15,9 +17,6 @@ public class Anthill {
     public int foodAccumulated = 0;
 
     protected int maxAntLife;
-    protected int maxAnts; 
-
-    protected int anthillColorR, anthillColorG, anthillColorB;
 
     public Anthill(PApplet sketch, int anthillx, int anthilly, Pheromone pheromone) {
         this.sketch = sketch;
@@ -26,9 +25,7 @@ public class Anthill {
         this.pheromone = pheromone;
     }
 
-
     public void releaseAnts(int antReleaseRate, int maxAntLife, int maxAnts) {
-        this.maxAnts = maxAnts; 
         for (int ant = 0; ant < antReleaseRate; ant++) {
             if (antsArray.size() < maxAnts) {
                 antsArray.add(new Ant(sketch, this, maxAntLife));
@@ -43,7 +40,25 @@ public class Anthill {
             ACO(ant, food);
         }
     }
-    
+
+    /*protected void personalACO(Ant ant, Food food, Callable function) throws Exception{
+        if(ant.hasFood){
+            if(ant.atAnthill()){
+                ant.hasFood = false;
+                pheromone.positions[ant.antx][ant.anty].pheromoneHome += (float) function.call(); 
+                spin180(ant);
+                findFood(ant);
+                foodAccumulated++;
+                // Did we collect 95% of the food?
+                if (foodAccumulated > 0.95 * food.foodSources * food.foodPerSources) {
+                    sketch.exit();
+                }
+            } else {
+                pheromone.positions[ant.antx][ant.anty].pheromoneFood += (float) function.call();
+                findAnthill(ant);
+            }
+        }
+    }*/
     protected void ACO(Ant ant, Food food) {
         if (ant.hasFood) {
             if (ant.atAnthill()) { //Ant has food and it's at home
@@ -145,7 +160,7 @@ public class Anthill {
             spin180(ant);
         }
     }
-    
+
     public void drawAnts(int antColorR, int antColorG, int antColorB, int antColorWithFoodR, int antColorWithFoodG, int antColorWithFoodB) {
         for (int a = 0; a < antsArray.size(); a++) {
             Ant ant = (Ant) antsArray.get(a);
@@ -164,11 +179,8 @@ public class Anthill {
             }
         }
     }
-       
+    
     public void drawAnthill(int anthillColorR, int anthillColorG, int anthillColorB) {
-        this.anthillColorR = anthillColorR;
-        this.anthillColorG = anthillColorG;
-        this.anthillColorB = anthillColorB;
         sketch.fill(anthillColorR, anthillColorG, anthillColorB);
         sketch.stroke(anthillColorR, anthillColorG, anthillColorB);
         sketch.ellipse(anthillx, anthilly, 5, 5);
